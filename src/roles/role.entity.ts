@@ -3,18 +3,29 @@ import {
   Column,
   Entity,
   Index,
+  JoinTable,
+  ManyToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
+import { Permission } from '@/permissions/permission.entity';
+
 @Entity({ name: 'role_entity' })
 export class Role extends BaseEntity {
+  public static DESC_MAX_LENGTH = 255;
+  public static NAME_MAX_LENGTH = 100;
+
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column()
-  @Index({ unique: true })
+  @Index()
+  @Column({ length: Role.NAME_MAX_LENGTH })
   name: string;
 
-  @Column({ length: 512, default: '' })
+  @Column({ length: Role.DESC_MAX_LENGTH, default: '' })
   description: string;
+
+  @ManyToMany(() => Permission)
+  @JoinTable()
+  permissions: Permission[];
 }

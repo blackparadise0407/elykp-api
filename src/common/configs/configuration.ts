@@ -27,12 +27,18 @@ export default () => ({
     apiKey: process.env.GEO_API_KEY,
   },
   auth: {
-    refreshTokenExpirationMs: 1 * 30 * 24 * 60 * 60, // 1 month
-    emailVerificationExpirationMs: 15 * 60, // 15 minutes
+    refreshTokenExpirationS: 1 * 30 * 24 * 60 * 60, // 1 month
+    emailVerificationExpirationS: 15 * 60, // 15 minutes
+    resetPasswordExpirationS: 15 * 60, // 15 minutes
   },
   baseUrl: process.env.BASE_URL || 'http://localhost:8081',
+  baseIp: '42.114.22.81',
   admin: {
     email: 'blackparadise0407@gmail.com',
     password: '040799',
+  },
+  geo: {
+    apiKey: process.env.GEO_API_KEY,
+    apiUrl: 'https://api.ipgeolocation.io/ipgeo',
   },
 });

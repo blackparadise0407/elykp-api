@@ -17,15 +17,18 @@ import { Role } from '@/roles/role.entity';
 
 @Entity({ name: 'user_entity' })
 export class User extends BaseEntity {
+  public static NAME_MAX_LENGTH = 255;
+  public static EMAIL_MAX_LENGTH = 255;
+
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Index()
-  @Column({ unique: true, length: 255 })
+  @Column({ unique: true, length: User.NAME_MAX_LENGTH })
   username: string;
 
   @Index()
-  @Column({ unique: true, length: 255 })
+  @Column({ unique: true, length: User.EMAIL_MAX_LENGTH })
   email: string;
 
   @Column()

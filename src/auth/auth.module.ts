@@ -1,3 +1,4 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
@@ -16,6 +17,7 @@ import { TokenService } from './token.service';
 
 @Module({
   imports: [
+    HttpModule,
     TypeOrmModule.forFeature([Token]),
     PassportModule.register({ session: false, defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({

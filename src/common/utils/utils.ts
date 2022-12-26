@@ -15,3 +15,8 @@ export const randomBytes = (bytes: number) => {
     });
   });
 };
+
+export const extractJwtFromBearer = (s?: string) => {
+  if (!s) return '';
+  return s.substring(7, s.length);
+};

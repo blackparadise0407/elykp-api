@@ -28,8 +28,14 @@ export class Token extends BaseEntity {
   @Column()
   value: string;
 
-  @Column({ name: 'expires_in_ms' })
-  expiresInMs: number;
+  @Column({ default: '' })
+  ip: string;
+
+  @Column({ name: 'user_agent', default: '' })
+  userAgent: string;
+
+  @Column({ name: 'expires_at' })
+  expiresAt: number;
 
   @Column({ name: 'user_id' })
   userId: string;

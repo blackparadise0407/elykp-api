@@ -12,18 +12,9 @@
       rel='stylesheet'
     />
     <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        -webkit-box-sizing: border-box;
-      }
-      
-      html { font-family: 'Roboto', sans-serif; }
-
-      body {
-        background-color: #F4F6F9;
-      }
+      * { margin: 0; padding: 0; box-sizing: border-box; -webkit-box-sizing:
+      border-box; } html { font-family: 'Roboto', sans-serif; } body {
+      background-color: #F4F6F9; }
     </style>
   </head>
   <body>
@@ -37,8 +28,10 @@
         <p style='margin-top: 1rem;'>{{{message}}}</p>
       {{/if}}
       {{#if redirectUrl}}
-        <a href='{{redirectUrl}}' style='display: inline-block; margin-top: 1rem; color: #139dfe'>Click here to go back
-          to the main application</a>
+        <a
+          href='{{redirectUrl}}'
+          style='display: inline-block; margin-top: 1rem; color: #139dfe'
+        >Click here to go back to the main application</a>
       {{/if}}
     </div>
   </body>

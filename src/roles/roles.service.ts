@@ -13,4 +13,12 @@ export class RolesService extends CRUDService<Role, Repository<Role>> {
   ) {
     super('Role', roleRepository);
   }
+
+  public getDetail(roleId: number) {
+    return this.repository
+      .createQueryBuilder('role')
+      .where('role.id = :roleId', { roleId })
+      .leftJoinAndSelect('role.permissions', 'permissions')
+      .getOne();
+  }
 }

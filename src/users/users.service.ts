@@ -24,6 +24,11 @@ export class UsersService extends CRUDService<User, Repository<User>> {
           email: usernameOrEmail,
         },
       ],
+      relations: {
+        roles: {
+          permissions: true,
+        },
+      },
     });
   }
 }

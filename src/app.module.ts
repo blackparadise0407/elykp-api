@@ -36,7 +36,7 @@ import { UsersModule } from './users/users.module';
         password: config.get('database.password'),
         database: config.get('database.name'),
         entities: [join(__dirname, '**/*.entity.{ts,js}')],
-        synchronize: true,
+        synchronize: false,
         retryAttempts: 5,
         retryDelay: 5000,
         useUTC: true,
