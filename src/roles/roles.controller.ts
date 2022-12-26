@@ -10,6 +10,7 @@ import {
 
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { Role } from './role.entity';
 import { RolesService } from './roles.service';
 
 @Controller('roles')
@@ -17,7 +18,13 @@ export class RolesController {
   constructor(private readonly rolesService: RolesService) {}
 
   @Post()
-  create(@Body() createRoleDto: CreateRoleDto) {}
+  async create(@Body() createRoleDto: CreateRoleDto) {
+    const role = new Role();
+    role.name = createRoleDto.name.toLowerCase().trim();
+    role.description = createRoleDto.description?.trim();
+    await role.save();
+    return role;
+  }
 
   @Get()
   findAll() {}

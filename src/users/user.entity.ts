@@ -6,11 +6,14 @@ import {
   CreateDateColumn,
   Entity,
   Index,
+  JoinTable,
+  ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
 import { Token } from '@/auth/entities/token.entity';
+import { Role } from '@/roles/role.entity';
 
 @Entity({ name: 'user_entity' })
 export class User extends BaseEntity {
@@ -42,9 +45,17 @@ export class User extends BaseEntity {
   @OneToMany(() => Token, (token) => token.user)
   tokens: Token[];
 
+  @ManyToMany(() => Role)
+  @JoinTable()
+  roles: Role[];
+
   @BeforeInsert()
-  async hashPassword() {
+  async beforeInsert() {
     const salt = await bcryptjs.genSalt(10);
     this.password = await bcryptjs.hash(this.password, salt);
+  }
+
+  compareHashPassword(raw: string) {
+    return bcryptjs.compare(raw, this.password);
   }
 }

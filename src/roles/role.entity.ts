@@ -1,4 +1,10 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BaseEntity,
+  Column,
+  Entity,
+  Index,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({ name: 'role_entity' })
 export class Role extends BaseEntity {
@@ -6,8 +12,9 @@ export class Role extends BaseEntity {
   id: number;
 
   @Column()
+  @Index({ unique: true })
   name: string;
 
-  @Column({ length: 512 })
+  @Column({ length: 512, default: '' })
   description: string;
 }

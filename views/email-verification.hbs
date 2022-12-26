@@ -11,27 +11,35 @@
       href='https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap'
       rel='stylesheet'
     />
-
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+      }
+      
       html { font-family: 'Roboto', sans-serif; }
+
+      body {
+        background-color: #F4F6F9;
+      }
     </style>
   </head>
-
   <body>
     <div
-      style='margin: 2rem auto 0; max-width: 40rem; padding: 2rem; text-align: center; background-color: white; box-shadow: 0 0 10px -5px #aaa; border-radius: 8px; '
+      style='margin: 2rem auto 0; max-width: 40rem; padding: 2rem; text-align: center; background-color: white; box-shadow: 0 0 10px -5px #aaa; border-radius: 4px; '
     >
       {{#if title}}
         <h1>{{title}}</h1>
       {{/if}}
       {{#if message}}
-        <p>{{{message}}}</p>
+        <p style='margin-top: 1rem;'>{{{message}}}</p>
       {{/if}}
       {{#if redirectUrl}}
-        <a href='{{redirectUrl}}' style='color: #139dfe'>Click here to go back
+        <a href='{{redirectUrl}}' style='display: inline-block; margin-top: 1rem; color: #139dfe'>Click here to go back
           to the main application</a>
       {{/if}}
     </div>
   </body>
-
 </html>

@@ -5,6 +5,7 @@ import { PassportModule } from '@nestjs/passport';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { MailModule } from '@/mail/mail.module';
+import { RolesModule } from '@/roles/roles.module';
 import { UsersModule } from '@/users/users.module';
 
 import { AuthController } from './auth.controller';
@@ -29,6 +30,7 @@ import { TokenService } from './token.service';
     }),
     MailModule,
     UsersModule,
+    RolesModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, TokenService, JwtStrategy],

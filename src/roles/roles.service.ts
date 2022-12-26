@@ -4,7 +4,7 @@ import { Repository } from 'typeorm';
 
 import { CRUDService } from '@/common/services/crud.service';
 
-import { Role } from './entities/role.entity';
+import { Role } from './role.entity';
 
 @Injectable()
 export class RolesService extends CRUDService<Role, Repository<Role>> {

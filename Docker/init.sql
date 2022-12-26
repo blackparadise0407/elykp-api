@@ -1,0 +1,7 @@
+CREATE USER elykp;
+
+CREATE DATABASE elykp_dev;
+GRANT ALL PRIVILEGES ON DATABASE elykp_dev TO elykp;
+
+CREATE DATABASE elykp_prod;
+GRANT ALL PRIVILEGES ON DATABASE elykp_prod TO elykp;

@@ -31,4 +31,8 @@ export default () => ({
     emailVerificationExpirationMs: 15 * 60, // 15 minutes
   },
   baseUrl: process.env.BASE_URL || 'http://localhost:8081',
+  admin: {
+    email: 'blackparadise0407@gmail.com',
+    password: '040799',
+  },
 });

@@ -1,0 +1,17 @@
+version: '3.9'
+
+services:
+  database:
+    build:
+      context: ./Docker
+      dockerfile: db.Dockerfile
+    ports:
+      - "11442:5432"
+    env_file:
+      - .env
+  redis:
+    image: redis
+    ports:
+      - "11443:6379"
+    env_file:
+      - .env

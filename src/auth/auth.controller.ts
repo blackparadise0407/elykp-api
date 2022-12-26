@@ -15,10 +15,13 @@ import { NOT_FOUND } from '@/common/constants/message';
 import { AuthUser } from '@/common/decorators/auth-user.decorator';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { MailService } from '@/mail/mail.service';
+import { RoleType } from '@/roles/enums/role.enum';
+import { RolesService } from '@/roles/roles.service';
 import { User } from '@/users/user.entity';
 import { UsersService } from '@/users/users.service';
 
 import { AuthService } from './auth.service';
+import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { Token } from './entities/token.entity';
 import { TokenType } from './enums/token.enum';
@@ -32,6 +35,7 @@ export class AuthController {
     private readonly tokenService: TokenService,
     private readonly mailService: MailService,
     private readonly config: ConfigService,
+    private readonly rolesService: RolesService,
   ) {}
 
   @Post('register')
@@ -50,10 +54,15 @@ export class AuthController {
       throw new BadRequestException('Email has been taken');
     }
 
+    const userRole = await this.rolesService.getBy({ name: RoleType.user });
+
     const user = new User();
     user.email = body.email;
     user.username = body.username;
     user.password = body.password;
+    if (userRole) {
+      user.roles = [userRole];
+    }
 
     await user.save();
 
@@ -72,6 +81,23 @@ export class AuthController {
       message:
         'Registration success, an verification link has been sent to your email address',
     };
+  }
+
+  @Post('login')
+  async login(@Body() body: LoginDto) {
+    const user = await this.usersService.existByEmailOrUsername(
+      body.usernameOrEmail,
+    );
+    if (!user) {
+      throw new BadRequestException('Bad credentials');
+    }
+    const isValidPassword = await user.compareHashPassword(body.password);
+    if (!isValidPassword) {
+      throw new BadRequestException('Bad credentials');
+    }
+    if (!user.emailVerified) {
+      throw new BadRequestException('Your email is not verified!');
+    }
   }
 
   @Get('email-verification')
