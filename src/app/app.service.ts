@@ -1,13 +1,13 @@
 import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
-import { Permission } from './permissions/permission.entity';
-import { PermissionsService } from './permissions/permissions.service';
-import { RoleType } from './roles/enums/role.enum';
-import { Role } from './roles/role.entity';
-import { RolesService } from './roles/roles.service';
-import { User } from './users/user.entity';
-import { UsersService } from './users/users.service';
+import { Permission } from '@/permissions/permission.entity';
+import { PermissionsService } from '@/permissions/permissions.service';
+import { RoleType } from '@/roles/enums/role.enum';
+import { Role } from '@/roles/role.entity';
+import { RolesService } from '@/roles/roles.service';
+import { User } from '@/users/user.entity';
+import { UsersService } from '@/users/users.service';
 
 const initialPermissions = ['read:permissions', 'write:permissions'];
 

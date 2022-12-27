@@ -5,7 +5,8 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import * as hbs from 'hbs';
 
-import { AppModule } from './app.module';
+import { AppModule } from '@/app/app.module';
+
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import { ResponseInterceptor } from './common/interceptors/response.interceptor';
 
@@ -14,8 +15,6 @@ async function bootstrap() {
   const logger = new Logger('App');
 
   app.enableCors();
-
-  app.setGlobalPrefix('/api');
 
   app.useGlobalPipes(new ValidationPipe());
 

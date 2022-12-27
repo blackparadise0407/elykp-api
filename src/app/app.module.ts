@@ -9,15 +9,16 @@ import { APP_GUARD } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { AuthModule } from '@/auth/auth.module';
+import configuration from '@/common/configs/configuration';
+import { HttpLoggerMiddleware } from '@/common/middlewares/http-logger.middleware';
+import { MailModule } from '@/mail/mail.module';
+import { PermissionsModule } from '@/permissions/permissions.module';
+import { RolesModule } from '@/roles/roles.module';
+import { UsersModule } from '@/users/users.module';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { AuthModule } from './auth/auth.module';
-import configuration from './common/configs/configuration';
-import { HttpLoggerMiddleware } from './common/middlewares/http-logger.middleware';
-import { MailModule } from './mail/mail.module';
-import { PermissionsModule } from './permissions/permissions.module';
-import { RolesModule } from './roles/roles.module';
-import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -35,7 +36,7 @@ import { UsersModule } from './users/users.module';
         username: config.get('database.username'),
         password: config.get('database.password'),
         database: config.get('database.name'),
-        entities: [join(__dirname, '**/*.entity.{ts,js}')],
+        entities: [join(__dirname, '..', '**/*.entity.{ts,js}')],
         synchronize: false,
         retryAttempts: 5,
         retryDelay: 5000,

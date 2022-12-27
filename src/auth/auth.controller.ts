@@ -192,10 +192,12 @@ export class AuthController {
   async forgotPassword(@Body() body: ForgotPasswordDto) {
     const user = await this.usersService.getBy({
       email: body.email,
-      emailVerified: true,
     });
     if (!user) {
       throw new BadRequestException('No user found with this email address');
+    }
+    if (!user.emailVerified) {
+      throw new BadRequestException('Your email is not verified yet');
     }
     const resetPasswordToken = new Token();
     resetPasswordToken.value = nanoid(6);
@@ -229,15 +231,34 @@ export class AuthController {
 
   @Post('reset-password')
   @Render('reset-password')
-  postResetPassword(@Body() body: ResetPasswordDto) {
-    if (body.confirmPassword !== body.password) {
+  async postResetPassword(@Body() body: ResetPasswordDto) {
+    const verificationCode = await this.tokenService.getBy({
+      value: body.code,
+      type: TokenType.resetPassword,
+    });
+    if (!verificationCode) {
       return {
-        error: 'Passwords do not match',
-        email: body.email,
-        code: body.code,
+        error: 'The verification code does not match our record.',
+        success: false,
       };
     }
-    return;
+    if (verificationCode.expiresAt * 1000 < Date.now()) {
+      return {
+        error: 'The verification code expired',
+        success: false,
+      };
+    }
+    const user = await this.usersService.getById(verificationCode.userId);
+    if (!user) {
+      throw new BadRequestException();
+    }
+    user.password = body.password;
+    await user.save();
+    await verificationCode.remove();
+
+    return {
+      success: true,
+    };
   }
 
   @Get('email-verification')

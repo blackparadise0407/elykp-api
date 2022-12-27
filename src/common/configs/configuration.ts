@@ -18,7 +18,7 @@ export default () => ({
   mail: {
     host: process.env.MAIL_HOST || 'smtp.gmail.com',
     port: process.env.MAIL_PORT || 465,
-    from: process.env.MAIL_FROM || `"No Reply" <${process.env.MAIL_USER}>`,
+    from: process.env.MAIL_FROM || `"Elykp" <${process.env.MAIL_USER}>`,
     user: process.env.MAIL_USER,
     pass: process.env.MAIL_PASS,
   },

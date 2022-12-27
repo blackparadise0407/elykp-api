@@ -1,9 +1,6 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  -webkit-box-sizing: border-box;
-}
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 html {
   font-family: 'Roboto', sans-serif;
@@ -13,11 +10,6 @@ body {
   background-color: #f4f6f9;
 }
 
-.container {
-  display: flex;
-  min-height: 100vh;
-}
-
 .background {
   flex: 1;
   background: url('https://images.unsplash.com/photo-1664575196412-ed801e8333a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1471&q=80')
@@ -25,8 +17,8 @@ body {
   background-size: cover;
 }
 
-.form-wrapper {
-  max-width: 40rem;
+.main {
+  max-width: 32rem;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -64,6 +56,7 @@ form > .form-group + .form-group {
   border-radius: 4px;
   outline: none;
   font-family: 'Roboto';
+  font-size: 0.9rem;
 }
 
 .form-control:focus {
@@ -79,6 +72,11 @@ form > .form-group + .form-group {
   font-family: 'Roboto';
   text-transform: capitalize;
   transition: background-color 0.2s ease;
+}
+
+.button--disabled {
+  pointer-events: none;
+  background-color: #b7b7b7;
 }
 
 .button:hover {
@@ -109,6 +107,12 @@ form > .form-group + .form-group {
   box-shadow: 5px 5px 10px -5px #9f9f9f;
 }
 
+.password-hint .title {
+  font-weight: 500;
+  font-size: 0.8rem;
+  margin-bottom: 0.2rem;
+}
+
 .confirm-password-hint p,
 .password-hint p {
   display: flex;
@@ -124,13 +128,15 @@ form > .form-group + .form-group {
 
 .confirm-password-hint p ion-icon,
 .password-hint p ion-icon {
-  color: #8a8a8a;
+  color: #2e2e2e;
   visibility: visible;
   opacity: 1;
   transition: visibility 0s linear 0s, opacity 400ms;
 }
 
+.confirm-password-hint p.valid,
+.password-hint p.valid,
 .confirm-password-hint p.valid ion-icon,
 .password-hint p.valid ion-icon {
-  color: #71b908;
+  color: #7cbd1b;
 }
