@@ -22,10 +22,6 @@ export default () => ({
     user: process.env.MAIL_USER,
     pass: process.env.MAIL_PASS,
   },
-  geolocation: {
-    url: `https://api.ipgeolocation.io/ipgeo`,
-    apiKey: process.env.GEO_API_KEY,
-  },
   auth: {
     refreshTokenExpirationS: 1 * 30 * 24 * 60 * 60, // 1 month
     emailVerificationExpirationS: 15 * 60, // 15 minutes

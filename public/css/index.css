@@ -11,7 +11,36 @@ html {
 
 body {
   background-color: #f4f6f9;
+}
+
+.container {
+  display: flex;
   min-height: 100vh;
+}
+
+.background {
+  flex: 1;
+  background: url('https://images.unsplash.com/photo-1664575196412-ed801e8333a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1471&q=80')
+    no-repeat center;
+  background-size: cover;
+}
+
+.form-wrapper {
+  max-width: 40rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+form.form {
+  max-width: 24rem;
+  width: 100%;
+  background-color: #fff;
+  border-radius: 4px;
+  padding: 1.5rem;
+  border: 1px solid #ebebeb;
 }
 
 form > .form-group + .form-group {
@@ -26,11 +55,11 @@ form > .form-group + .form-group {
 
 .form-group > label {
   font-size: 0.8rem;
-  font-weight: 500;
+  color: #8f8f8f;
 }
 
 .form-control {
-  padding: 0.5rem 0.6rem;
+  padding: 0.6rem 0.6rem;
   border: 1px solid #dfdfdf;
   border-radius: 4px;
   outline: none;
@@ -38,12 +67,70 @@ form > .form-group + .form-group {
 }
 
 .form-control:focus {
-  outline: 2px solid #e0e0fd;
+  outline: 2px solid #dbdbff;
 }
 
 .button {
+  padding: 0.6rem 0.6rem;
+  border: none;
+  border-radius: 4px;
+  background-color: #3b82f6;
+  color: #ffffff;
+  font-family: 'Roboto';
+  text-transform: capitalize;
+  transition: background-color 0.2s ease;
 }
 
-/* .form-control:focus-visible {
-  outline: none;
-} */
+.button:hover {
+  cursor: pointer;
+  background-color: rgba(72, 139, 247, 0.9);
+}
+
+.button:focus {
+  outline: 2px solid #e0e0fd;
+}
+
+.alert {
+  padding: 0.6rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.alert--error {
+  background-color: #ef4444;
+  color: #fff;
+}
+
+.password-hint,
+.confirm-password-hint {
+  background-color: #fff;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  box-shadow: 5px 5px 10px -5px #9f9f9f;
+}
+
+.confirm-password-hint p,
+.password-hint p {
+  display: flex;
+  align-items: center;
+  gap: 0.1rem;
+  font-size: 0.8rem;
+}
+
+.confirm-password-hint p ion-icon,
+.password-hint p ion-icon {
+  font-size: 1.1rem;
+}
+
+.confirm-password-hint p ion-icon,
+.password-hint p ion-icon {
+  color: #8a8a8a;
+  visibility: visible;
+  opacity: 1;
+  transition: visibility 0s linear 0s, opacity 400ms;
+}
+
+.confirm-password-hint p.valid ion-icon,
+.password-hint p.valid ion-icon {
+  color: #71b908;
+}

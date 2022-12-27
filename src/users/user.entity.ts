@@ -1,4 +1,5 @@
 import * as bcryptjs from 'bcryptjs';
+import { Exclude } from 'class-transformer';
 import {
   BaseEntity,
   BeforeInsert,
@@ -31,6 +32,7 @@ export class User extends BaseEntity {
   @Column({ unique: true, length: User.EMAIL_MAX_LENGTH })
   email: string;
 
+  @Exclude()
   @Column()
   password: string;
 

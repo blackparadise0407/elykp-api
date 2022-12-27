@@ -32,6 +32,7 @@ import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterDto } from './dto/register.dto';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 import { Token } from './entities/token.entity';
 import { TokenType } from './enums/token.enum';
 import { TokenService } from './token.service';
@@ -227,9 +228,16 @@ export class AuthController {
   }
 
   @Post('reset-password')
-  postResetPassword(@Body() body: any) {
-    console.log(body);
-    return 'Ok';
+  @Render('reset-password')
+  postResetPassword(@Body() body: ResetPasswordDto) {
+    if (body.confirmPassword !== body.password) {
+      return {
+        error: 'Passwords do not match',
+        email: body.email,
+        code: body.code,
+      };
+    }
+    return;
   }
 
   @Get('email-verification')

@@ -6,6 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
+    "gulp": "gulp",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
@@ -57,6 +58,7 @@
     "@types/bcryptjs": "^2.4.2",
     "@types/bull": "^4.10.0",
     "@types/express": "^4.17.13",
+    "@types/hbs": "^4.0.1",
     "@types/jest": "27.4.1",
     "@types/node": "^16.0.0",
     "@types/passport-jwt": "^3.0.8",
@@ -68,6 +70,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.0.0",
+    "gulp": "^4.0.2",
     "jest": "^27.2.5",
     "prettier": "^2.3.2",
     "source-map-support": "^0.5.20",
