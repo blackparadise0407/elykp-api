@@ -99,7 +99,7 @@ form > .form-group + .form-group {
 }
 
 .password-hint .title {
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.8rem;
   margin-bottom: 0.2rem;
 }
