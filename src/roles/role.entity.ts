@@ -18,7 +18,7 @@ export class Role extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Index()
+  @Index({ unique: true })
   @Column({ length: Role.NAME_MAX_LENGTH })
   name: string;
 

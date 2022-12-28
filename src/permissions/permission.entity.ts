@@ -14,7 +14,7 @@ export class Permission extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Index()
+  @Index({ unique: true })
   @Column({ length: Permission.NAME_MAX_LENGTH })
   name: string;
 

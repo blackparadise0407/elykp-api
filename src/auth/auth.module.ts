@@ -33,8 +33,10 @@ import { TokenService } from './token.service';
     MailModule,
     UsersModule,
     RolesModule,
+    AuthModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, TokenService, JwtStrategy],
+  exports: [AuthService, TokenService],
 })
 export class AuthModule {}

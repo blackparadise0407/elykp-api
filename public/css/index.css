@@ -1,5 +1,25 @@
 @tailwind base;
 @tailwind components;
+
+@layer components {
+  .button {
+    @apply p-2.5 bg-blue-500 text-white rounded transition-colors;
+  }
+
+  .button--disabled {
+    @apply pointer-events-none bg-gray-400;
+  }
+
+  .button:hover {
+    cursor: pointer;
+    background-color: rgba(72, 139, 247, 0.9);
+  }
+
+  .button:focus {
+    outline: 2px solid #e0e0fd;
+  }
+}
+
 @tailwind utilities;
 
 html {
@@ -51,52 +71,17 @@ form > .form-group + .form-group {
 }
 
 .form-control {
-  padding: 0.6rem 0.6rem;
-  border: 1px solid #dfdfdf;
-  border-radius: 4px;
-  outline: none;
   font-family: 'Roboto';
   font-size: 0.9rem;
-}
-
-.form-control:focus {
-  outline: 2px solid #dbdbff;
-}
-
-.button {
-  padding: 0.6rem 0.6rem;
-  border: none;
-  border-radius: 4px;
-  background-color: #3b82f6;
-  color: #ffffff;
-  font-family: 'Roboto';
-  text-transform: capitalize;
-  transition: background-color 0.2s ease;
-}
-
-.button--disabled {
-  pointer-events: none;
-  background-color: #b7b7b7;
-}
-
-.button:hover {
-  cursor: pointer;
-  background-color: rgba(72, 139, 247, 0.9);
-}
-
-.button:focus {
-  outline: 2px solid #e0e0fd;
+  @apply p-2.5 outline-none rounded border focus:ring-2 focus:ring-blue-100;
 }
 
 .alert {
-  padding: 0.6rem 0.6rem;
-  border-radius: 4px;
-  font-size: 0.9rem;
+  @apply py-3 px-3 text-sm rounded;
 }
 
 .alert--error {
-  background-color: #ef4444;
-  color: #fff;
+  @apply text-white bg-red-500;
 }
 
 .password-hint,

@@ -3,6 +3,7 @@ import { join } from 'path';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import * as cookieParser from 'cookie-parser';
 import * as hbs from 'hbs';
 
 import { AppModule } from '@/app/app.module';
@@ -15,6 +16,8 @@ async function bootstrap() {
   const logger = new Logger('App');
 
   app.enableCors();
+
+  app.use(cookieParser());
 
   app.useGlobalPipes(new ValidationPipe());
 

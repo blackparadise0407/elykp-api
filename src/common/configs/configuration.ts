@@ -29,6 +29,7 @@ export default () => ({
   },
   baseUrl: process.env.BASE_URL || 'http://localhost:8081',
   baseIp: '42.114.22.81',
+  redirectUrl: process.env.REDIRECT_URL || 'https://localhost:5173',
   admin: {
     email: 'blackparadise0407@gmail.com',
     password: '040799',

@@ -42,15 +42,7 @@ export class TokenService extends CRUDService<Token, Repository<Token>> {
     });
   }
 
-  async generateRefreshToken({
-    user,
-    ip,
-    userAgent,
-  }: {
-    user: User;
-    ip: string;
-    userAgent: string;
-  }) {
+  async generateRefreshToken(user: User) {
     const refreshToken = new Token();
     refreshToken.value = this.generateRefreshTokenValue();
     refreshToken.expiresAt = moment()
@@ -59,9 +51,12 @@ export class TokenService extends CRUDService<Token, Repository<Token>> {
       .unix();
     refreshToken.user = user;
     refreshToken.type = TokenType.refresh;
-    refreshToken.ip = ip;
-    refreshToken.userAgent = userAgent;
     await refreshToken.save();
     return refreshToken;
+  }
+
+  async verifyAccessToken(tokenStr?: string) {
+    if (!tokenStr) return false;
+    return !!(await this.jwtService.verifyAsync(tokenStr));
   }
 }

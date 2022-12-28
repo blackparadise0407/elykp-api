@@ -4,7 +4,6 @@ import {
   Controller,
   Get,
   Headers,
-  Ip,
   NotFoundException,
   Query,
   Render,
@@ -13,9 +12,7 @@ import {
 import { Post } from '@nestjs/common/decorators';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import { Throttle } from '@nestjs/throttler';
 import * as moment from 'moment';
-import { nanoid } from 'nanoid';
 
 import { NOT_FOUND } from '@/common/constants/message';
 import { AuthUser } from '@/common/decorators/auth-user.decorator';
@@ -28,11 +25,8 @@ import { User } from '@/users/user.entity';
 import { UsersService } from '@/users/users.service';
 
 import { AuthService } from './auth.service';
-import { ForgotPasswordDto } from './dto/forgot-password.dto';
-import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { RegisterDto } from './dto/register.dto';
-import { ResetPasswordDto } from './dto/reset-password.dto';
 import { Token } from './entities/token.entity';
 import { TokenType } from './enums/token.enum';
 import { TokenService } from './token.service';
@@ -95,58 +89,6 @@ export class AuthController {
     };
   }
 
-  @Post('login')
-  @Throttle(5, 5 * 60)
-  async login(
-    @Headers('user-agent') userAgent: string,
-    @Body() body: LoginDto,
-    @Ip() ip: string,
-  ) {
-    // const ipAddress = ip === '::1' ? this.config.get('baseIp') : ip;
-    const user = await this.usersService.existByEmailOrUsername(
-      body.usernameOrEmail,
-    );
-    if (!user) {
-      throw new BadRequestException('Bad credentials');
-    }
-
-    const isValidPassword = await user.compareHashPassword(body.password);
-    if (!isValidPassword) {
-      throw new BadRequestException('Bad credentials');
-    }
-
-    if (!user.emailVerified) {
-      throw new BadRequestException('Your email is not verified!');
-    }
-
-    // const existingSessions = await this.tokenService.getMany({
-    //   where: {
-    //     userId: user.id,
-    //     type: TokenType.refresh,
-    //   },
-    // });
-
-    // if (
-    //   existingSessions.some((it) => it.ip !== ip && it.userAgent !== userAgent)
-    // ) {
-    //   const geo = await this.authService.getGeoLocationByIp(ipAddress);
-    //   await this.mailService.sendLoginConfirmationEmail({
-    //     user,
-    //     geo,
-    //     userAgent,
-    //   });
-    //   return;
-    // }
-
-    const accessToken = await this.tokenService.generateAccessToken(user);
-    const refreshToken = await this.tokenService.generateRefreshToken({
-      user,
-      ip,
-      userAgent,
-    });
-    return { accessToken, refreshToken: refreshToken.value };
-  }
-
   @Post('token')
   async refreshToken(
     @Headers('Authorization') authHeader: string,
@@ -185,79 +127,6 @@ export class AuthController {
     return {
       accessToken,
       refreshToken: refreshToken.value,
-    };
-  }
-
-  @Post('forgot-password')
-  async forgotPassword(@Body() body: ForgotPasswordDto) {
-    const user = await this.usersService.getBy({
-      email: body.email,
-    });
-    if (!user) {
-      throw new BadRequestException('No user found with this email address');
-    }
-    if (!user.emailVerified) {
-      throw new BadRequestException('Your email is not verified yet');
-    }
-    const resetPasswordToken = new Token();
-    resetPasswordToken.value = nanoid(6);
-    resetPasswordToken.type = TokenType.resetPassword;
-    resetPasswordToken.expiresAt = moment()
-      .add(+this.config.get('auth.resetPasswordExpirationS')!, 's')
-      .utc()
-      .unix();
-    resetPasswordToken.user = user;
-
-    await resetPasswordToken.save();
-
-    await this.mailService.sendResetPasswordLinkEmail(
-      user,
-      resetPasswordToken.value,
-    );
-
-    return {
-      message: 'A reset password link has been sent to your email address',
-    };
-  }
-
-  @Get('reset-password')
-  @Render('reset-password')
-  getResetPassword(@Query('code') code: string, @Query('email') email: string) {
-    return {
-      email,
-      code,
-    };
-  }
-
-  @Post('reset-password')
-  @Render('reset-password')
-  async postResetPassword(@Body() body: ResetPasswordDto) {
-    const verificationCode = await this.tokenService.getBy({
-      value: body.code,
-      type: TokenType.resetPassword,
-    });
-    if (!verificationCode) {
-      return {
-        error: 'The verification code does not match our record.',
-        success: false,
-      };
-    }
-    if (verificationCode.expiresAt * 1000 < Date.now()) {
-      return {
-        error: 'The verification code expired',
-        success: false,
-      };
-    }
-    const user = await this.usersService.getById(verificationCode.userId);
-    if (!user) {
-      throw new BadRequestException();
-    }
-    user.password = body.password;
-    await user.save();
-    await verificationCode.remove();
-
-    return {
-      success: true,
     };
   }
 

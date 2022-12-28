@@ -64,7 +64,7 @@ import { AppService } from './app.service';
           from: config.get('mail.from'),
         },
         template: {
-          dir: join(__dirname, 'mail', 'templates'),
+          dir: join(__dirname, '..', 'mail/templates'),
           adapter: new HandlebarsAdapter(),
           options: {
             strict: true,
