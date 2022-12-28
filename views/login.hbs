@@ -1,21 +1,26 @@
-<div class="mx-auto mt-5 max-w-[26rem] p-5 bg-white shadow rounded">
-    {{#if error}}
-    <div class="alert alert--error mb-4">{{error}}</div>
-    {{/if}}
-    <form action="login" method="post">
-        <input type="hidden" name="returnUrl" value="{{returnUrl}}">
-        <div class="form-group">
-            <label for="usernameOrEmail">Username or email</label>
-            <input class="form-control" type="text" name="usernameOrEmail">
-        </div>
-        <div class="form-group">
-            <label for="password">Password</label>
-            <input class="form-control" type="password" name="password">
-        </div>
-        <a class="inline-block text-sm text-blue-500 hover:text-blue-400 cursor-pointer" href="/forgot-password">Forgot
-            password?</a>
-        <div class="form-group mt-5">
-            <button class="button">Login</button>
-        </div>
-    </form>
+<div class='mx-auto mt-5 max-w-[24rem]'>
+  {{#if error}}
+  <div class='alert alert--error mb-4'>{{error}}</div>
+  {{/if}}
+  <form action='login' method='post'>
+    <h1 class="font-semibold text-2xl text-gray-700 mb-5">Welcome back</h1>
+    <input type='hidden' name='returnUrl' value='{{returnUrl}}' />
+    <div class='form-group'>
+      <label for='usernameOrEmail'>Username or Email</label>
+      <input class='form-control' type='text' name='usernameOrEmail' placeholder='name@example.com' />
+    </div>
+    <div class='form-group'>
+      <label for='password'>Password</label>
+      <input class='form-control' type='password' name='password' placeholder='Enter password' />
+    </div>
+    <a class='inline-block text-sm cursor-pointer' href='/forgot-password'>
+      Forgot password?
+    </a>
+    <div class='form-group mt-5'>
+      <button class='button'>Login</button>
+    </div>
+    <p class='text-center text-sm mt-5'>Don't have an account?
+      <a class="font-semibold" href='/register'>Sign up</a>
+    </p>
+  </form>
 </div>

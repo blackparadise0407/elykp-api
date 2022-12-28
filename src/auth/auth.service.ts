@@ -116,28 +116,34 @@ export class AuthService {
   }
 
   public async resetPassword(resetPasswordDto: ResetPasswordDto) {
-    const verificationCode = await this.tokenService.getBy({
-      value: resetPasswordDto.code,
-      type: TokenType.resetPassword,
-    });
-    if (!verificationCode) {
-      return {
-        error: 'The verification code does not match our record.',
-        success: false,
-      };
-    }
-    if (verificationCode.expiresAt * 1000 < Date.now()) {
-      return {
-        error: 'The verification code expired',
-        success: false,
-      };
-    }
-    const user = await this.usersService.getById(verificationCode.userId);
+    const verifiedToken = await this.verifyTokenAsync(
+      resetPasswordDto.code,
+      TokenType.resetPassword,
+    );
+
+    const user = await this.usersService.getById(verifiedToken.userId);
     if (!user) {
       throw new BadRequestException();
     }
     user.password = resetPasswordDto.password;
+    user.hashPassword();
     await user.save();
-    await verificationCode.remove();
+    await verifiedToken.remove();
+  }
+
+  public async verifyTokenAsync(tokenStr: string, tokenType: TokenType) {
+    const token = await this.tokenService.getBy({
+      value: tokenStr,
+      type: tokenType,
+    });
+    if (!token) {
+      throw new BadRequestException(
+        'The verification code does not match our record.',
+      );
+    }
+    if (token.expiresAt * 1000 < Date.now()) {
+      throw new BadRequestException('The verification code expired');
+    }
+    return token;
   }
 }

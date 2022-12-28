@@ -57,6 +57,10 @@ export class TokenService extends CRUDService<Token, Repository<Token>> {
 
   async verifyAccessToken(tokenStr?: string) {
     if (!tokenStr) return false;
-    return !!(await this.jwtService.verifyAsync(tokenStr));
+    try {
+      return !!(await this.jwtService.verifyAsync(tokenStr));
+    } catch (e) {
+      return false;
+    }
   }
 }

@@ -55,7 +55,7 @@ export class User extends BaseEntity {
   roles: Role[];
 
   @BeforeInsert()
-  async beforeInsert() {
+  async hashPassword() {
     const salt = await bcryptjs.genSalt(10);
     this.password = await bcryptjs.hash(this.password, salt);
   }

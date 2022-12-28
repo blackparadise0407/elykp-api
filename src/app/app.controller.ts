@@ -6,16 +6,22 @@ import {
   Query,
   Render,
   Res,
+  UseFilters,
+  UseGuards,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { Throttle } from '@nestjs/throttler';
 import { Response } from 'express';
 
 import { AuthService } from '@/auth/auth.service';
 import { ForgotPasswordDto } from '@/auth/dto/forgot-password.dto';
 import { LoginDto } from '@/auth/dto/login.dto';
 import { ResetPasswordDto } from '@/auth/dto/reset-password.dto';
+import { TokenType } from '@/auth/enums/token.enum';
 import { TokenService } from '@/auth/token.service';
 import { Cookie } from '@/common/decorators/cookie.decorator';
+import { AuthFilter } from '@/common/filters/auth.filter';
+import { LoginGuard } from '@/common/guards/login.guard';
 
 @Controller()
 export class AppController {
@@ -24,6 +30,13 @@ export class AppController {
     private readonly authService: AuthService,
     private readonly tokenService: TokenService,
   ) {}
+
+  @Get()
+  @UseGuards(LoginGuard)
+  @UseFilters(AuthFilter)
+  get(@Res() res: Response) {
+    res.redirect(this.config.get('redirectUrl')!);
+  }
 
   @Get('login')
   async getLogin(
@@ -41,7 +54,7 @@ export class AppController {
   }
 
   @Post('login')
-  // @Throttle(5, 5 * 60)
+  @Throttle(5, 5 * 60)
   async login(@Body() body: LoginDto, @Res() res: Response) {
     try {
       const { accessToken, refreshToken } = await this.authService.login(body);
@@ -87,15 +100,23 @@ export class AppController {
   }
 
   @Get('reset-password')
-  @Render('reset-password')
   async resetPassword(
+    @Res() res: Response,
     @Query('code') code: string,
     @Query('email') email: string,
   ) {
-    return {
-      email,
-      code,
-    };
+    try {
+      const verifiedToken = await this.authService.verifyTokenAsync(
+        code,
+        TokenType.resetPassword,
+      );
+      res.render('reset-password', {
+        email,
+        code: verifiedToken.value,
+      });
+    } catch (e) {
+      res.render('error', { error: e.message });
+    }
   }
 
   @Post('reset-password')

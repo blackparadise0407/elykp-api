@@ -1,9 +1,20 @@
 @tailwind base;
+
+@layer base {
+  body {
+    @apply font-medium;
+  }
+
+  a {
+    @apply text-blue-500 hover:text-blue-600 transition-colors;
+  }
+}
+
 @tailwind components;
 
 @layer components {
   .button {
-    @apply p-2.5 bg-blue-500 text-white rounded transition-colors;
+    @apply px-4 py-1.5 bg-blue-500 font-medium text-sm text-white rounded transition-colors;
   }
 
   .button--disabled {
@@ -23,7 +34,7 @@
 @tailwind utilities;
 
 html {
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Source Sans Pro', sans-serif;
 }
 
 body {
@@ -60,20 +71,15 @@ form > .form-group + .form-group {
 }
 
 .form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
+  @apply flex flex-col gap-2;
 }
 
 .form-group > label {
-  font-size: 0.8rem;
-  color: #8f8f8f;
+  @apply font-semibold text-sm text-gray-800;
 }
 
 .form-control {
-  font-family: 'Roboto';
-  font-size: 0.9rem;
-  @apply p-2.5 outline-none rounded border focus:ring-2 focus:ring-blue-100;
+  @apply p-2 text-sm outline-none rounded border focus:border-blue-300 focus:ring-2 focus:ring-blue-200;
 }
 
 .alert {

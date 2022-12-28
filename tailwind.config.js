@@ -1,7 +1,11 @@
 module.exports = {
   content: ['./views/**/*.hbs'],
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        body: '#a7b1c2',
+      },
+    },
   },
   variants: {
     extend: {},

@@ -39,7 +39,7 @@ export class MailService {
         username: user.username,
         link:
           this.config.get('baseUrl') +
-          '/api/auth/email-verification?code=' +
+          '/email-verification?code=' +
           verificationCode,
       },
     });
@@ -76,7 +76,7 @@ export class MailService {
         username: user.username,
         link:
           this.config.get('baseUrl') +
-          `/api/auth/reset-password?code=${verificationCode}&email=${user.email}`,
+          `/reset-password?code=${verificationCode}&email=${user.email}`,
       },
     });
   }
