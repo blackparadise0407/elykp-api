@@ -83,11 +83,15 @@ form > .form-group + .form-group {
 }
 
 .alert {
-  @apply py-3 px-3 text-sm rounded;
+  @apply py-3 pl-3 pr-6 mb-4 text-sm rounded;
 }
 
 .alert--error {
   @apply text-white bg-red-500;
+}
+
+.alert--success {
+  @apply text-white bg-green-500;
 }
 
 .password-hint,

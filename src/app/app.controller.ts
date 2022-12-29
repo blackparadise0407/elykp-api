@@ -16,6 +16,7 @@ import { Response } from 'express';
 import { AuthService } from '@/auth/auth.service';
 import { ForgotPasswordDto } from '@/auth/dto/forgot-password.dto';
 import { LoginDto } from '@/auth/dto/login.dto';
+import { RegisterDto } from '@/auth/dto/register.dto';
 import { ResetPasswordDto } from '@/auth/dto/reset-password.dto';
 import { TokenType } from '@/auth/enums/token.enum';
 import { TokenService } from '@/auth/token.service';
@@ -77,6 +78,29 @@ export class AppController {
     }
   }
 
+  @Get('register')
+  @Render('register')
+  async getRegister() {
+    return {};
+  }
+
+  @Post('register')
+  @Render('register')
+  async register(@Body() body: RegisterDto) {
+    try {
+      await this.authService.register(body);
+      return {
+        message:
+          'Registration success, an verification link has been sent to your email address',
+      };
+    } catch (e) {
+      return {
+        success: false,
+        error: e.message,
+      };
+    }
+  }
+
   @Get('forgot-password')
   @Render('forgot-password')
   async forgotPassword() {
@@ -126,11 +150,30 @@ export class AppController {
       await this.authService.resetPassword(body);
       return {
         success: true,
+        email: body.email,
       };
     } catch (e) {
       return {
         success: false,
         error: e.message,
+      };
+    }
+  }
+
+  @Get('email-verification')
+  @Render('email-verification')
+  async emailVerification(@Query('code') code: string) {
+    try {
+      await this.authService.verifyEmail(code);
+      return {
+        title: 'Success!',
+        message:
+          'Thank you for your support, we have successfully verified your email address. <br /> You can now proceed to the homepage',
+      };
+    } catch (e) {
+      return {
+        title: 'Verification error!',
+        message: e.message,
       };
     }
   }

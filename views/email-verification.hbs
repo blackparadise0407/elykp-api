@@ -1,13 +1,9 @@
-<div
-  style='margin: 2rem auto 0; max-width: 40rem; padding: 2rem; text-align: center; background-color: white; box-shadow: 0 0 10px -5px #aaa; border-radius: 4px; '>
-  {{#if title}}
-  <h1>{{title}}</h1>
-  {{/if}}
-  {{#if message}}
-  <p style='margin-top: 1rem;'>{{{message}}}</p>
-  {{/if}}
-  {{#if redirectUrl}}
-  <a href='{{redirectUrl}}' style='display: inline-block; margin-top: 1rem; color: #139dfe'>Click here to go back to the
-    main application</a>
-  {{/if}}
+<div class="mx-auto max-w-[24rem] space-y-2">
+  <h1 class="font-semibold text-2xl text-gray-700">{{title}}!</h1>
+  <p class="text-body text-sm">
+    {{{message}}}
+  </p>
+  <a class="inline-block" href="/login">
+    <button class="button w-[15rem]">Sign In</button>
+  </a>
 </div>

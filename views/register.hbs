@@ -1,0 +1,30 @@
+<div class='mx-auto mt-5 max-w-[24rem]'>
+    {{#if error}}
+    {{> alert message=error type='error'}}
+    {{/if}}
+    {{#if message}}
+    {{> alert message=message type='success'}}
+    {{/if}}
+    <form action='register' method='post'>
+        <h1 class="font-semibold text-2xl text-gray-700 mb-5">Welcome to Elykp</h1>
+        <input type='hidden' name='returnUrl' value='{{returnUrl}}' />
+        <div class='form-group'>
+            <label for='username'>Username</label>
+            <input class='form-control' type='text' name='username' placeholder='Enter username' />
+        </div>
+        <div class='form-group'>
+            <label for='email'>Email</label>
+            <input class='form-control' type='email' name='email' placeholder='name@example.com' />
+        </div>
+        <div class='form-group'>
+            <label for='password'>Password</label>
+            <input class='form-control' type='password' name='password' placeholder='Enter password' />
+        </div>
+        <div class='form-group mt-5'>
+            <button class='button'>Sign up</button>
+        </div>
+        <p class='text-center text-sm mt-5'>Already have an account?
+            <a class="font-semibold" href='/register'>Sign in</a>
+        </p>
+    </form>
+</div>

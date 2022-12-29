@@ -9,11 +9,14 @@ import { nanoid } from 'nanoid';
 import { catchError, lastValueFrom, map, of } from 'rxjs';
 
 import { MailService } from '@/mail/mail.service';
+import { RoleType } from '@/roles/enums/role.enum';
+import { RolesService } from '@/roles/roles.service';
 import { User } from '@/users/user.entity';
 import { UsersService } from '@/users/users.service';
 
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
 import { LoginDto } from './dto/login.dto';
+import { RegisterDto } from './dto/register.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
 import { Token } from './entities/token.entity';
 import { TokenType } from './enums/token.enum';
@@ -29,6 +32,7 @@ export class AuthService {
     private readonly usersService: UsersService,
     private readonly tokenService: TokenService,
     private readonly mailService: MailService,
+    private readonly rolesService: RolesService,
   ) {}
 
   public async login(loginDto: LoginDto) {
@@ -145,5 +149,68 @@ export class AuthService {
       throw new BadRequestException('The verification code expired');
     }
     return token;
+  }
+
+  public async register(registerDto: RegisterDto) {
+    const existByUsername = await this.usersService.getBy({
+      username: registerDto.username,
+    });
+    if (existByUsername) {
+      throw new BadRequestException('Username has been taken');
+    }
+
+    const existByEmail = await this.usersService.getBy({
+      email: registerDto.email,
+    });
+    if (existByEmail) {
+      throw new BadRequestException('Email has been taken');
+    }
+
+    const userRole = await this.rolesService.getBy({ name: RoleType.user });
+
+    const user = new User();
+    user.email = registerDto.email;
+    user.username = registerDto.username;
+    user.password = registerDto.password;
+    if (userRole) {
+      user.roles = [userRole];
+    }
+
+    await user.save();
+
+    const emailVerification = new Token();
+    emailVerification.expiresAt = moment()
+      .add(+this.config.get('auth.emailVerificationExpirationS'), 's')
+      .utc()
+      .unix();
+    emailVerification.type = TokenType.emailVerification;
+    emailVerification.value = this.getEmailVerificationCode();
+    emailVerification.userId = user.id;
+    await emailVerification.save();
+
+    await this.mailService.sendVerificationEmail(user, emailVerification.value);
+  }
+
+  public async verifyEmail(code: string) {
+    const verificationCode = await this.tokenService.get({
+      where: {
+        type: TokenType.emailVerification,
+        value: code,
+      },
+    });
+    if (!verificationCode) {
+      throw new BadRequestException(
+        'The verification code does not match our record.',
+      );
+    }
+    const user = await this.usersService.getById(verificationCode.userId);
+    if (!user) {
+      throw new BadRequestException(
+        'The verification code does not match our record.',
+      );
+    }
+    user.emailVerified = true;
+    await user.save();
+    await verificationCode.remove();
   }
 }
