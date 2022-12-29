@@ -9,7 +9,12 @@ import { RolesService } from '@/roles/roles.service';
 import { User } from '@/users/user.entity';
 import { UsersService } from '@/users/users.service';
 
-const initialPermissions = ['read:permissions', 'write:permissions'];
+const initialPermissions = [
+  'read:permissions',
+  'write:permissions',
+  'read:roles',
+  'write:roles',
+];
 
 @Injectable()
 export class AppService implements OnApplicationBootstrap {

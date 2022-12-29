@@ -6,7 +6,11 @@ import {
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
+
+import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
+import { PermissionGuard } from '@/common/guards/permission.guard';
 
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
@@ -27,7 +31,11 @@ export class RolesController {
   }
 
   @Get()
-  findAll() {}
+  @UseGuards(JwtAuthGuard)
+  @UseGuards(PermissionGuard('read:roles'))
+  findAll() {
+    return this.rolesService.getMany();
+  }
 
   @Get(':id')
   findOne(@Param('id') id: string) {}

@@ -36,7 +36,7 @@ export class AppController {
   @UseGuards(LoginGuard)
   @UseFilters(AuthFilter)
   get(@Res() res: Response) {
-    res.redirect(this.config.get('redirectUrl')!);
+    res.redirect('/roles');
   }
 
   @Get('login')
@@ -49,7 +49,7 @@ export class AppController {
     if (verifyResult) {
       return res.redirect(302, this.config.get('redirectUrl')!);
     }
-    return res.render('login', {
+    return res.render('auth/login', {
       returnUrl,
     });
   }
@@ -72,20 +72,20 @@ export class AppController {
       const url = this.config.get('redirectUrl')! + (body.returnUrl ?? '');
       res.redirect(302, url);
     } catch (e) {
-      res.render('login', {
+      res.render('auth/login', {
         error: e.message,
       });
     }
   }
 
   @Get('register')
-  @Render('register')
+  @Render('auth/register')
   async getRegister() {
     return {};
   }
 
   @Post('register')
-  @Render('register')
+  @Render('auth/register')
   async register(@Body() body: RegisterDto) {
     try {
       await this.authService.register(body);
@@ -102,13 +102,13 @@ export class AppController {
   }
 
   @Get('forgot-password')
-  @Render('forgot-password')
+  @Render('auth/forgot-password')
   async forgotPassword() {
     return {};
   }
 
   @Post('forgot-password')
-  @Render('forgot-password')
+  @Render('auth/forgot-password')
   async postForgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     try {
       await this.authService.forgotPassword(forgotPasswordDto);
@@ -134,7 +134,7 @@ export class AppController {
         code,
         TokenType.resetPassword,
       );
-      res.render('reset-password', {
+      res.render('auth/reset-password', {
         email,
         code: verifiedToken.value,
       });
@@ -144,7 +144,7 @@ export class AppController {
   }
 
   @Post('reset-password')
-  @Render('reset-password')
+  @Render('auth/reset-password')
   async postResetPassword(@Body() body: ResetPasswordDto) {
     try {
       await this.authService.resetPassword(body);
@@ -161,7 +161,7 @@ export class AppController {
   }
 
   @Get('email-verification')
-  @Render('email-verification')
+  @Render('auth/email-verification')
   async emailVerification(@Query('code') code: string) {
     try {
       await this.authService.verifyEmail(code);

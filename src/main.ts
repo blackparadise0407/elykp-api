@@ -28,7 +28,7 @@ async function bootstrap() {
   hbs.registerPartials(join(__dirname, '..', 'views/partials'));
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.setBaseViewsDir(join(__dirname, '..', 'views'));
-  app.set('view options', { layout: 'index' });
+  app.set('view options', { layout: 'layouts/auth' });
   app.setViewEngine('hbs');
 
   await app.listen(AppModule.port);
