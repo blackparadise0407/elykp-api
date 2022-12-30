@@ -10,6 +10,5 @@ export class LoginDto {
   password: string;
 
   @IsOptional()
-  @IsString()
-  returnUrl?: string;
+  state?: any;
 }

@@ -9,7 +9,7 @@ export default () => ({
   },
   jwt: {
     secret: 'not_very_secret',
-    expiresIn: '15m',
+    expiresIn: '10s',
   },
   redis: {
     host: process.env.REDIS_HOST || 'localhost',
@@ -29,7 +29,8 @@ export default () => ({
   },
   baseUrl: process.env.BASE_URL || 'http://localhost:8081',
   baseIp: '42.114.22.81',
-  redirectUrl: process.env.REDIRECT_URL || 'https://localhost:5173',
+  redirectUrl:
+    process.env.REDIRECT_URL || 'https://localhost:5173/signin-callback.html',
   admin: {
     email: 'blackparadise0407@gmail.com',
     password: '040799',
@@ -37,5 +38,10 @@ export default () => ({
   geo: {
     apiKey: process.env.GEO_API_KEY,
     apiUrl: 'https://api.ipgeolocation.io/ipgeo',
+  },
+  google: {
+    clientId: process.env.GG_CLIENT_ID,
+    clientSecret: process.env.GG_CLIENT_SECRET,
+    redirectUri: process.env.GG_REDIRECT_URI,
   },
 });

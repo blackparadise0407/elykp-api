@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Get,
@@ -12,6 +13,7 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { Throttle } from '@nestjs/throttler';
 import { Response } from 'express';
+import * as qs from 'qs';
 
 import { AuthService } from '@/auth/auth.service';
 import { ForgotPasswordDto } from '@/auth/dto/forgot-password.dto';
@@ -22,6 +24,7 @@ import { TokenType } from '@/auth/enums/token.enum';
 import { TokenService } from '@/auth/token.service';
 import { Cookie } from '@/common/decorators/cookie.decorator';
 import { AuthFilter } from '@/common/filters/auth.filter';
+import { MvcExceptionFilter } from '@/common/filters/mvc-exception.filter';
 import { LoginGuard } from '@/common/guards/login.guard';
 
 @Controller()
@@ -45,10 +48,10 @@ export class AppController {
     @Cookie('accessToken') accessToken: string,
     @Query('return_url') returnUrl?: string,
   ) {
-    const verifyResult = await this.tokenService.verifyAccessToken(accessToken);
-    if (verifyResult) {
-      return res.redirect(302, this.config.get('redirectUrl')!);
-    }
+    // const verifyResult = await this.tokenService.verifyAccessToken(accessToken);
+    // if (verifyResult) {
+    //   return res.redirect(302, this.config.get('redirectUrl')!);
+    // }
     return res.render('auth/login', {
       returnUrl,
     });
@@ -56,23 +59,23 @@ export class AppController {
 
   @Post('login')
   @Throttle(5, 5 * 60)
-  async login(@Body() body: LoginDto, @Res() res: Response) {
+  @UseFilters(MvcExceptionFilter)
+  async authorize(@Body() body: LoginDto, @Res() res: Response) {
     try {
-      const { accessToken, refreshToken } = await this.authService.login(body);
-      res.cookie('accessToken', accessToken, {
-        secure: true,
-        httpOnly: true,
-        sameSite: 'strict',
+      const { accessToken, refreshToken, user } = await this.authService.login(
+        body,
+      );
+      const queryString = qs.stringify({
+        id_token: accessToken,
+        refresh_token: refreshToken,
+        state: body.state,
+        user_id: user.id,
       });
-      res.cookie('refreshToken', refreshToken, {
-        secure: true,
-        httpOnly: true,
-        sameSite: 'strict',
-      });
-      const url = this.config.get('redirectUrl')! + (body.returnUrl ?? '');
-      res.redirect(302, url);
+      const url = new URL(this.config.get('redirectUrl')!);
+      url.search = '?' + queryString;
+      return res.redirect(302, url.toString());
     } catch (e) {
-      res.render('auth/login', {
+      return res.render('auth/login', {
         error: e.message,
       });
     }
@@ -86,6 +89,7 @@ export class AppController {
 
   @Post('register')
   @Render('auth/register')
+  @UseFilters(MvcExceptionFilter)
   async register(@Body() body: RegisterDto) {
     try {
       await this.authService.register(body);
@@ -109,6 +113,7 @@ export class AppController {
 
   @Post('forgot-password')
   @Render('auth/forgot-password')
+  @UseFilters(MvcExceptionFilter)
   async postForgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     try {
       await this.authService.forgotPassword(forgotPasswordDto);
@@ -145,6 +150,7 @@ export class AppController {
 
   @Post('reset-password')
   @Render('auth/reset-password')
+  @UseFilters(MvcExceptionFilter)
   async postResetPassword(@Body() body: ResetPasswordDto) {
     try {
       await this.authService.resetPassword(body);
@@ -162,19 +168,52 @@ export class AppController {
 
   @Get('email-verification')
   @Render('auth/email-verification')
+  @UseFilters(MvcExceptionFilter)
   async emailVerification(@Query('code') code: string) {
-    try {
-      await this.authService.verifyEmail(code);
-      return {
-        title: 'Success!',
-        message:
-          'Thank you for your support, we have successfully verified your email address. <br /> You can now proceed to the homepage',
-      };
-    } catch (e) {
-      return {
-        title: 'Verification error!',
-        message: e.message,
-      };
+    await this.authService.verifyEmail(code);
+    return {
+      title: 'Success!',
+      message:
+        'Thank you for your support, we have successfully verified your email address. <br /> You can now proceed to the homepage',
+    };
+  }
+
+  @Get('google-signin')
+  googleSignIn(@Res() res: Response) {
+    const url =
+      'https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=383521474601-1lagrhu0b3el5k1g5uthb3khfdvfijmm.apps.googleusercontent.com&scope=openid%20email%20profile&redirect_uri=http%3A%2F%2Flocalhost%3A8081%2Fcallback%2Fgoogle';
+    return res.redirect(url);
+  }
+
+  @Get('callback/google')
+  @UseFilters(MvcExceptionFilter)
+  async googleCallback(@Res() res: Response, @Query('code') code: string) {
+    if (!code) {
+      throw new BadRequestException('Invalid request');
     }
+    const { id_token } = await this.authService.exchangeGoogleToken(code);
+
+    const decodedGoogleJwt = await this.tokenService.decodeGoogleJwt(id_token);
+    if (decodedGoogleJwt) {
+      const signInResult = await this.authService.googleSignIn(
+        decodedGoogleJwt,
+      );
+      if (signInResult) {
+        const { accessToken, refreshToken } = signInResult;
+        res.cookie('accessToken', accessToken, {
+          secure: true,
+          httpOnly: true,
+          sameSite: 'strict',
+        });
+        res.cookie('refreshToken', refreshToken, {
+          secure: true,
+          httpOnly: true,
+          sameSite: 'strict',
+        });
+        return res.redirect(this.config.get('redirectUrl')!);
+      }
+    }
+
+    return res.render('auth/callback');
   }
 }

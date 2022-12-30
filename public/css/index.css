@@ -14,16 +14,20 @@
 
 @layer components {
   .button {
-    @apply px-4 py-1.5 bg-blue-500 font-medium text-sm text-white rounded transition-colors;
+    @apply px-4 py-1.5 flex items-center justify-center gap-2 bg-white border border-gray-300 font-medium text-sm rounded transition-colors;
+  }
+
+  .button--primary {
+    @apply bg-blue-500 text-white border-transparent;
   }
 
   .button--disabled {
     @apply pointer-events-none bg-gray-400;
   }
 
-  .button:hover {
+  .button--primary:hover {
     cursor: pointer;
-    background-color: rgba(72, 139, 247, 0.9);
+    background-color: #488bf7e6;
   }
 
   .button:focus {

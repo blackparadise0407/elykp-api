@@ -8,30 +8,22 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { Post } from '@nestjs/common/decorators';
-import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
 import { NOT_FOUND } from '@/common/constants/message';
 import { AuthUser } from '@/common/decorators/auth-user.decorator';
 import { JwtAuthGuard } from '@/common/guards/jwt-auth.guard';
 import { extractJwtFromBearer } from '@/common/utils/utils';
-import { MailService } from '@/mail/mail.service';
-import { RolesService } from '@/roles/roles.service';
 import { UsersService } from '@/users/users.service';
 
-import { AuthService } from './auth.service';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { TokenService } from './token.service';
 
-@Controller('auth')
+@Controller('api/auth')
 export class AuthController {
   constructor(
-    private readonly authService: AuthService,
     private readonly usersService: UsersService,
     private readonly tokenService: TokenService,
-    private readonly mailService: MailService,
-    private readonly config: ConfigService,
-    private readonly rolesService: RolesService,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -73,6 +65,7 @@ export class AuthController {
     return {
       accessToken,
       refreshToken: refreshToken.value,
+      userId: user.id,
     };
   }
 

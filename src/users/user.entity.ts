@@ -42,6 +42,12 @@ export class User extends BaseEntity {
   })
   emailVerified: boolean;
 
+  @Column({
+    default: '',
+    name: 'idp_id',
+  })
+  idpId: string;
+
   @CreateDateColumn({
     name: 'created_at',
   })

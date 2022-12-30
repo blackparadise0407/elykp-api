@@ -1,7 +1,7 @@
 <div class="mx-auto max-w-[24rem] space-y-2">
-    <h1 class="font-semibold text-2xl text-gray-700">Error!</h1>
+    <h1 class="font-semibold text-2xl text-gray-700">{{#if title}}{{title}}{{else}}Error!{{/if}}</h1>
     <p class="text-body text-sm">{{error}}</p>
     <a class="inline-block" href="/login">
-        <button class="button w-[15rem]">Back to log in</button>
+        <button class="button button--primary w-[15rem]">Back to log in</button>
     </a>
 </div>

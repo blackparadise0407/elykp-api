@@ -1,7 +1,11 @@
 import { randomBytes } from 'crypto';
 
 import { HttpService } from '@nestjs/axios';
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as moment from 'moment';
@@ -21,6 +25,8 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { Token } from './entities/token.entity';
 import { TokenType } from './enums/token.enum';
 import { GeoIPResponse } from './interfaces/geo-ip-response.interface';
+import { GGTokenExchangeResponse } from './interfaces/gg-token-exchange-response.interface';
+import { GGJwtPayload } from './interfaces/google-jwt-payload.interface';
 import { TokenService } from './token.service';
 
 @Injectable()
@@ -40,12 +46,12 @@ export class AuthService {
       loginDto.usernameOrEmail,
     );
     if (!user) {
-      throw new BadRequestException('Bad credentials');
+      throw new BadRequestException('Invalid credentials');
     }
 
     const isValidPassword = await user.compareHashPassword(loginDto.password);
     if (!isValidPassword) {
-      throw new BadRequestException('Bad credentials');
+      throw new BadRequestException('Invalid credentials');
     }
 
     if (!user.emailVerified) {
@@ -55,11 +61,7 @@ export class AuthService {
     const accessToken = await this.tokenService.generateAccessToken(user);
     const refreshToken = await this.tokenService.generateRefreshToken(user);
 
-    return { accessToken, refreshToken: refreshToken.value };
-  }
-
-  public generateAccessToken(user: User) {
-    return this.jwtService.sign({ subject: user.id });
+    return { accessToken, refreshToken: refreshToken.value, user };
   }
 
   public getEmailVerificationCode() {
@@ -70,7 +72,7 @@ export class AuthService {
     return randomBytes(size).toString('hex');
   }
 
-  public getGeoLocationByIp(ip: string): Promise<any> {
+  public getGeoLocationByIp(ip: string): Promise<GeoIPResponse> {
     return lastValueFrom(
       this.http
         .get<GeoIPResponse>(this.config.get('geo.apiUrl')!, {
@@ -212,5 +214,102 @@ export class AuthService {
     user.emailVerified = true;
     await user.save();
     await verificationCode.remove();
+  }
+
+  public async exchangeGoogleToken(
+    code: string,
+  ): Promise<GGTokenExchangeResponse> {
+    const clientId = this.config.get('google.clientId');
+    if (!clientId) {
+      throw new InternalServerErrorException('Client id not configured');
+    }
+    const clientSecret = this.config.get('google.clientSecret');
+    if (!clientSecret) {
+      throw new InternalServerErrorException('Client secret not configured');
+    }
+    const redirectUri = this.config.get('google.redirectUri');
+    if (!redirectUri) {
+      throw new InternalServerErrorException('Redirect url not configured');
+    }
+
+    return lastValueFrom(
+      this.http
+        .post<GGTokenExchangeResponse>(
+          'https://oauth2.googleapis.com/token',
+          null,
+          {
+            params: {
+              code,
+              client_id: clientId,
+              client_secret: clientSecret,
+              redirect_uri: this.config.get('google.redirectUri'),
+              grant_type: 'authorization_code',
+            },
+          },
+        )
+        .pipe(
+          map((resp) => resp.data),
+          catchError((e) => {
+            const message = e.response?.data?.error ?? e.message;
+            throw new BadRequestException(message);
+          }),
+        ),
+    );
+  }
+
+  public async googleSignIn(ggJwtPayload: GGJwtPayload) {
+    const existingUser = await this.usersService.get({
+      where: {
+        email: ggJwtPayload.email,
+      },
+      relations: {
+        roles: { permissions: true },
+      },
+    });
+    if (!existingUser) {
+      const userRole = await this.rolesService.get({
+        where: {
+          name: RoleType.user,
+        },
+        relations: {
+          permissions: true,
+        },
+      });
+
+      const newUser = new User();
+      newUser.email = ggJwtPayload.email;
+      newUser.password = '';
+      newUser.username = ggJwtPayload.email.substring(
+        0,
+        ggJwtPayload.email.indexOf('@'),
+      );
+      newUser.emailVerified = true;
+      newUser.idpId = ggJwtPayload.sub;
+      if (userRole) {
+        newUser.roles = [userRole];
+      }
+
+      await newUser.save();
+
+      const accessToken = await this.tokenService.generateAccessToken(newUser);
+      const refreshToken = await this.tokenService.generateRefreshToken(
+        newUser,
+      );
+
+      return { accessToken, refreshToken: refreshToken.value };
+    }
+    if (existingUser.idpId === ggJwtPayload.sub) {
+      const accessToken = await this.tokenService.generateAccessToken(
+        existingUser,
+      );
+      const refreshToken = await this.tokenService.generateRefreshToken(
+        existingUser,
+      );
+
+      return { accessToken, refreshToken: refreshToken.value };
+    }
+    throw new BadRequestException(
+      'This email is already linked to another account!',
+    );
   }
 }

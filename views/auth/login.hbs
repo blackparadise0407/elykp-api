@@ -1,23 +1,32 @@
 <div class='mx-auto mt-5 max-w-[24rem]'>
   {{#if error}}
-  {{> alert message=error type='error'}}
+  {{> alert message=error type='error' closable='true'}}
   {{/if}}
   <form action='login' method='post'>
-    <h1 class="font-semibold text-2xl text-gray-700 mb-5">Welcome back</h1>
+    <h1 class="font-semibold text-2xl text-gray-700">Welcome back</h1>
+    <div class="flex flex-col my-5">
+      <a class="block text-gray-700 hover:text-gray-700" href="/google-signin">
+        <button class="button w-full font-semibold" type="button">
+          <img class="w-6 h-6" src="/images/google.png" alt="">
+          Continue with google
+        </button>
+      </a>
+    </div>
+    <p class="text-center text-gray-400 text-sm mb-5">or sign in using email</p>
     <input type='hidden' name='returnUrl' value='{{returnUrl}}' />
     <div class='form-group'>
       <label for='usernameOrEmail'>Username or Email</label>
-      <input class='form-control' type='text' name='usernameOrEmail' placeholder='name@example.com' />
+      <input required="true" class='form-control' type='text' name='usernameOrEmail' placeholder='name@example.com' />
     </div>
     <div class='form-group'>
       <label for='password'>Password</label>
-      <input class='form-control' type='password' name='password' placeholder='Enter password' />
+      <input required="true" class='form-control' type='password' name='password' placeholder='Enter password' />
     </div>
     <a class='inline-block text-sm cursor-pointer' href='/forgot-password'>
       Forgot password?
     </a>
     <div class='form-group mt-5'>
-      <button class='button'>Login</button>
+      <button class='button button--primary'>Login</button>
     </div>
     <p class='text-center text-sm mt-5'>Don't have an account?
       <a class="font-semibold" href='/register'>Sign up</a>

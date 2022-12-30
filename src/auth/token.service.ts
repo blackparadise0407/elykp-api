@@ -13,6 +13,7 @@ import { User } from '@/users/user.entity';
 
 import { Token } from './entities/token.entity';
 import { TokenType } from './enums/token.enum';
+import { GGJwtPayload } from './interfaces/google-jwt-payload.interface';
 
 @Injectable()
 export class TokenService extends CRUDService<Token, Repository<Token>> {
@@ -39,6 +40,8 @@ export class TokenService extends CRUDService<Token, Repository<Token>> {
     return this.jwtService.sign({
       subject: user.id,
       permissions,
+      username: user.username,
+      email: user.email,
     });
   }
 
@@ -62,5 +65,9 @@ export class TokenService extends CRUDService<Token, Repository<Token>> {
     } catch (e) {
       return false;
     }
+  }
+
+  async decodeGoogleJwt(tokenStr: string) {
+    return this.jwtService.decode(tokenStr) as Promise<GGJwtPayload>;
   }
 }
