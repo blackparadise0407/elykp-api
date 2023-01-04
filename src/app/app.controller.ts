@@ -17,6 +17,7 @@ import * as qs from 'qs';
 
 import { AuthService } from '@/auth/auth.service';
 import { ForgotPasswordDto } from '@/auth/dto/forgot-password.dto';
+import { IssuedTokensDto } from '@/auth/dto/issued-token.dto';
 import { LoginDto } from '@/auth/dto/login.dto';
 import { RegisterDto } from '@/auth/dto/register.dto';
 import { ResetPasswordDto } from '@/auth/dto/reset-password.dto';
@@ -62,18 +63,10 @@ export class AppController {
   @UseFilters(MvcExceptionFilter)
   async authorize(@Body() body: LoginDto, @Res() res: Response) {
     try {
-      const { accessToken, refreshToken, user } = await this.authService.login(
+      const loginResult = await this.authService.loginByUsernameAndPassword(
         body,
       );
-      const queryString = qs.stringify({
-        id_token: accessToken,
-        refresh_token: refreshToken,
-        state: body.state,
-        user_id: user.id,
-      });
-      const url = new URL(this.config.get('redirectUrl')!);
-      url.search = '?' + queryString;
-      return res.redirect(302, url.toString());
+      return res.redirect(this.getPostLoginUrl(loginResult, body.state));
     } catch (e) {
       return res.render('auth/login', {
         error: e.message,
@@ -112,20 +105,27 @@ export class AppController {
   }
 
   @Post('forgot-password')
-  @Render('auth/forgot-password')
   @UseFilters(MvcExceptionFilter)
-  async postForgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+  async postForgotPassword(
+    @Res() res: Response,
+    @Body() forgotPasswordDto: ForgotPasswordDto,
+  ) {
     try {
       await this.authService.forgotPassword(forgotPasswordDto);
-      return {
-        success: true,
-      };
+      return res.redirect('forgot-password-confirmation');
     } catch (e) {
-      return {
+      return res.render('auth/forgot-password', {
         success: false,
         error: e.message,
-      };
+      });
     }
+  }
+
+  @Get('forgot-password-confirmation')
+  @Render('auth/forgot-password-confirmation')
+  @UseFilters(MvcExceptionFilter)
+  forgotPasswordConfirmation() {
+    return {};
   }
 
   @Get('reset-password')
@@ -195,25 +195,27 @@ export class AppController {
 
     const decodedGoogleJwt = await this.tokenService.decodeGoogleJwt(id_token);
     if (decodedGoogleJwt) {
-      const signInResult = await this.authService.googleSignIn(
-        decodedGoogleJwt,
-      );
+      const signInResult = await this.authService.loginByIdp(decodedGoogleJwt);
       if (signInResult) {
-        const { accessToken, refreshToken } = signInResult;
-        res.cookie('accessToken', accessToken, {
-          secure: true,
-          httpOnly: true,
-          sameSite: 'strict',
-        });
-        res.cookie('refreshToken', refreshToken, {
-          secure: true,
-          httpOnly: true,
-          sameSite: 'strict',
-        });
-        return res.redirect(this.config.get('redirectUrl')!);
+        return res.redirect(this.getPostLoginUrl(signInResult));
       }
     }
 
     return res.render('auth/callback');
+  }
+
+  private getPostLoginUrl(
+    { accessToken, refreshToken, user }: IssuedTokensDto,
+    state?: any,
+  ) {
+    const queryString = qs.stringify({
+      id_token: accessToken,
+      refresh_token: refreshToken,
+      state,
+      user_id: user.id,
+    });
+    const url = new URL(this.config.get('redirectUrl')!);
+    url.search = '?' + queryString;
+    return url.toString();
   }
 }

@@ -1,6 +1,9 @@
 <div class="mx-auto max-w-[24rem] space-y-2">
     <h1 class="font-semibold text-2xl text-gray-700">{{#if title}}{{title}}{{else}}Error!{{/if}}</h1>
     <p class="text-body text-sm">{{error}}</p>
+    {{#if internal}}
+    <p class="text-body text-sm">An internal error occured. Our developers have already been notified.</p>
+    {{/if}}
     <a class="inline-block" href="/login">
         <button class="button button--primary w-[15rem]">Back to log in</button>
     </a>

@@ -13,7 +13,7 @@ import { User } from '@/users/user.entity';
 
 import { Token } from './entities/token.entity';
 import { TokenType } from './enums/token.enum';
-import { GGJwtPayload } from './interfaces/google-jwt-payload.interface';
+import { IDPJwtPayload } from './interfaces/idp-jwt-payload.interface';
 
 @Injectable()
 export class TokenService extends CRUDService<Token, Repository<Token>> {
@@ -68,6 +68,6 @@ export class TokenService extends CRUDService<Token, Repository<Token>> {
   }
 
   async decodeGoogleJwt(tokenStr: string) {
-    return this.jwtService.decode(tokenStr) as Promise<GGJwtPayload>;
+    return this.jwtService.decode(tokenStr) as Promise<IDPJwtPayload>;
   }
 }
