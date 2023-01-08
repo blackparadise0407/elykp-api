@@ -2,6 +2,7 @@ import { join } from 'path';
 
 import { MailerModule } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
+import { HttpModule } from '@nestjs/axios';
 import { BullModule } from '@nestjs/bull';
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -12,6 +13,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from '@/auth/auth.module';
 import configuration from '@/common/configs/configuration';
 import { HttpLoggerMiddleware } from '@/common/middlewares/http-logger.middleware';
+import { DiscordLoggerService } from '@/common/services/discord-logger.service';
 import { MailModule } from '@/mail/mail.module';
 import { PermissionsModule } from '@/permissions/permissions.module';
 import { RolesModule } from '@/roles/roles.module';
@@ -88,6 +90,7 @@ import { AppService } from './app.service';
     UsersModule,
     PermissionsModule,
     RolesModule,
+    HttpModule,
   ],
   controllers: [AppController],
   providers: [
@@ -96,6 +99,7 @@ import { AppService } from './app.service';
       useClass: ThrottlerGuard,
     },
     AppService,
+    DiscordLoggerService,
   ],
 })
 export class AppModule implements NestModule {

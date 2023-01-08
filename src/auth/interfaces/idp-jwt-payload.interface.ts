@@ -1,4 +1,4 @@
-export interface GGJwtPayload {
+export interface IDPJwtPayload {
   iss?: string;
   azp?: string;
   aud?: string;

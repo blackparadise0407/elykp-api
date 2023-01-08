@@ -19,6 +19,7 @@ import { User } from '@/users/user.entity';
 import { UsersService } from '@/users/users.service';
 
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
+import { IssuedTokensDto } from './dto/issued-token.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { ResetPasswordDto } from './dto/reset-password.dto';
@@ -26,7 +27,7 @@ import { Token } from './entities/token.entity';
 import { TokenType } from './enums/token.enum';
 import { GeoIPResponse } from './interfaces/geo-ip-response.interface';
 import { GGTokenExchangeResponse } from './interfaces/gg-token-exchange-response.interface';
-import { GGJwtPayload } from './interfaces/google-jwt-payload.interface';
+import { IDPJwtPayload } from './interfaces/idp-jwt-payload.interface';
 import { TokenService } from './token.service';
 
 @Injectable()
@@ -41,7 +42,7 @@ export class AuthService {
     private readonly rolesService: RolesService,
   ) {}
 
-  public async login(loginDto: LoginDto) {
+  public async loginByUsernameAndPassword(loginDto: LoginDto) {
     const user = await this.usersService.existByEmailOrUsername(
       loginDto.usernameOrEmail,
     );
@@ -58,10 +59,7 @@ export class AuthService {
       throw new BadRequestException('Your email is not verified!');
     }
 
-    const accessToken = await this.tokenService.generateAccessToken(user);
-    const refreshToken = await this.tokenService.generateRefreshToken(user);
-
-    return { accessToken, refreshToken: refreshToken.value, user };
+    return this.issueTokens(user);
   }
 
   public getEmailVerificationCode() {
@@ -257,10 +255,10 @@ export class AuthService {
     );
   }
 
-  public async googleSignIn(ggJwtPayload: GGJwtPayload) {
+  public async loginByIdp(idpJwtPayload: IDPJwtPayload) {
     const existingUser = await this.usersService.get({
       where: {
-        email: ggJwtPayload.email,
+        email: idpJwtPayload.email,
       },
       relations: {
         roles: { permissions: true },
@@ -277,39 +275,34 @@ export class AuthService {
       });
 
       const newUser = new User();
-      newUser.email = ggJwtPayload.email;
+      newUser.email = idpJwtPayload.email;
       newUser.password = '';
-      newUser.username = ggJwtPayload.email.substring(
+      newUser.username = idpJwtPayload.email.substring(
         0,
-        ggJwtPayload.email.indexOf('@'),
+        idpJwtPayload.email.indexOf('@'),
       );
       newUser.emailVerified = true;
-      newUser.idpId = ggJwtPayload.sub;
+      newUser.idpId = idpJwtPayload.sub;
       if (userRole) {
         newUser.roles = [userRole];
       }
 
       await newUser.save();
 
-      const accessToken = await this.tokenService.generateAccessToken(newUser);
-      const refreshToken = await this.tokenService.generateRefreshToken(
-        newUser,
-      );
-
-      return { accessToken, refreshToken: refreshToken.value };
+      return this.issueTokens(newUser);
     }
-    if (existingUser.idpId === ggJwtPayload.sub) {
-      const accessToken = await this.tokenService.generateAccessToken(
-        existingUser,
-      );
-      const refreshToken = await this.tokenService.generateRefreshToken(
-        existingUser,
-      );
-
-      return { accessToken, refreshToken: refreshToken.value };
+    if (existingUser.idpId === idpJwtPayload.sub) {
+      return this.issueTokens(existingUser);
     }
     throw new BadRequestException(
       'This email is already linked to another account!',
     );
+  }
+
+  private async issueTokens(user: User): Promise<IssuedTokensDto> {
+    const accessToken = await this.tokenService.generateAccessToken(user);
+    const refreshToken = await this.tokenService.generateRefreshToken(user);
+
+    return { accessToken, refreshToken: refreshToken.value, user };
   }
 }

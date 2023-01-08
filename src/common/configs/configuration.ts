@@ -44,4 +44,7 @@ export default () => ({
     clientSecret: process.env.GG_CLIENT_SECRET,
     redirectUri: process.env.GG_REDIRECT_URI,
   },
+  discord: {
+    webhookUrl: process.env.DC_WEBHOOK_URL,
+  },
 });
