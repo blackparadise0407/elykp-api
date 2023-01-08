@@ -9,7 +9,7 @@ export default () => ({
   },
   jwt: {
     secret: 'not_very_secret',
-    expiresIn: '10s',
+    expiresIn: '15m',
   },
   redis: {
     host: process.env.REDIS_HOST || 'localhost',

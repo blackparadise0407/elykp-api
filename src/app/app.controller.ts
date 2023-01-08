@@ -68,7 +68,7 @@ export class AppController {
       const queryString = qs.stringify({
         id_token: accessToken,
         refresh_token: refreshToken,
-        state: body.state,
+        return_url: body.returnUrl,
         user_id: user.id,
       });
       const url = new URL(this.config.get('redirectUrl')!);

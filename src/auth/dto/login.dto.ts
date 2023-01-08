@@ -10,5 +10,5 @@ export class LoginDto {
   password: string;
 
   @IsOptional()
-  state?: any;
+  returnUrl?: string;
 }
