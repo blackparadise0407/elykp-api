@@ -49,10 +49,6 @@ export class AppController {
     @Cookie('accessToken') accessToken: string,
     @Query('return_url') returnUrl?: string,
   ) {
-    // const verifyResult = await this.tokenService.verifyAccessToken(accessToken);
-    // if (verifyResult) {
-    //   return res.redirect(302, this.config.get('redirectUrl')!);
-    // }
     return res.render('auth/login', {
       returnUrl,
     });
@@ -206,7 +202,7 @@ export class AppController {
 
   private getPostLoginUrl(
     { accessToken, refreshToken, user }: IssuedTokensDto,
-    state?: any,
+    state?: string,
   ) {
     const queryString = qs.stringify({
       id_token: accessToken,
